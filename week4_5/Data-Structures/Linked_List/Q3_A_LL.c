@@ -152,7 +152,7 @@ void bestOddItemsToBack(LinkedList *ll) {
 			}
 		}
 		else { // 홀수의 경우
-			if (oddHead = NULL) {
+			if (oddHead == NULL) {
 				oddHead = cur;
 				oddTail = cur;
 			} else {
