@@ -102,7 +102,33 @@ int main()
 
 void frontBackSplitLinkedList(LinkedList *ll, LinkedList *resultFrontList, LinkedList *resultBackList)
 {
-	/* add your code here */
+	if (ll == NULL || ll->head == NULL)
+    	return;
+
+	// size 계산
+	int rep = ll->size / 2;
+
+	if (ll->size % 2 != 0)  // 딱 나누어 떨어지지 않는다면, front linked list에 숫자를 1개 더 넣는다.
+		rep++;
+	
+	ListNode *cur = ll->head;
+
+	// 사이즈 지정
+	resultFrontList->size = rep;
+
+	for (int i = 1; i < rep; i++) { // front의 갯수만큼 나아감
+		cur = cur->next;
+	}
+	
+	resultBackList->head = cur->next; // 다음 노드부터 back linked list로 연결함
+	resultBackList->size = ll->size / 2; 
+
+	cur->next = NULL; // 프론트로 지정하기 위해 back의 연결을 끊음
+	resultFrontList->head = ll->head;
+
+	// 프로그램 종료 후 서버가 터지는 오류 해결 (분할이 끝난 후 원본 리스트 ll을 빈 리스트로 만들어주는 것)
+	ll->head = NULL;
+	ll->size = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
