@@ -116,15 +116,60 @@ int main()
 
 void createQueueFromLinkedList(LinkedList *ll, Queue *q)
 {
-	/* add your code here */
+	ListNode *cur = ll->head;
+	ListNode *queCur = NULL;
+	q->ll.head = NULL;
+	q->ll.size = 0;
+
+	while (cur != NULL) {
+		ListNode *nowNode = malloc(sizeof(ListNode));
+		
+		nowNode->item = cur->item;
+		nowNode->next = NULL;
+		
+		if (q->ll.head == NULL) {
+			q->ll.head = nowNode;
+			queCur = nowNode;
+		}
+		else {
+			queCur->next = nowNode;
+			queCur = queCur->next;
+		}
+		cur = cur->next;
+	}
+
+	q->ll.size = ll->size;
 }
 
 void removeOddValues(Queue *q)
 {
-	/* add your code here */
+	ListNode *cur = q->ll.head;
+	ListNode *prev = NULL;
+
+	while (cur != NULL) {
+		ListNode *nextNode = cur->next;
+
+		// 홀수 값만 지워줌
+		if (cur->item % 2 != 0) {
+			// 헤더를 삭제하는 경우
+			if (prev == NULL) {
+				q->ll.head = nextNode;
+			} else {
+				prev->next = nextNode;
+			}
+			
+			free(cur);
+			q->ll.size--;
+		}
+		else { // 삭제하지 않는 경우에만 prev 이동
+			prev = cur;
+		}
+
+		cur = nextNode;
+	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 void enqueue(Queue *q, int item) {
 	insertNode(&(q->ll), q->ll.size, item);
