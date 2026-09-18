@@ -103,7 +103,26 @@ int main()
 
 int isStackPairwiseConsecutive(Stack *s)
 {
-  /* add your code here */
+	Stack *temp = malloc(sizeof(Stack)); 
+	temp->ll.head = malloc(sizeof(ListNode));
+
+	int result = 1;
+	while (!isEmptyStack(s)) {
+		// 만약에 이번 스택이 1개만 남았다면?
+
+		int n1 = pop(s);
+		int n2 = pop(s);
+		
+		
+		if (n1 - n2 != 1 || n2 - n1 != 1) {
+			result = 0;
+		}
+		push(temp, n1);
+		if (n2 != INT_MIN) push(temp, n2);
+	}
+
+	s = temp;
+	return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
