@@ -87,9 +87,7 @@ static Widget *widget_new(const VTable *vt, int id, const char *label) {
     /* [Thinking Point]
     *   w 에 아직 아무 값도 넣지 않았는데, sizeof *w 로 *w 를 써도 괜찮은 이유는?
     *   tip 1. sizeof 는 피연산자를 '실행(역참조)'하지 않고 '타입'만 본다.
-    *          → *w 의 타입(Widget)만 필요할 뿐, w 를 실제로 따라가지 않는다.
     *   tip 2. 그래서 sizeof *w 는 (VLA 제외) 컴파일 타임에 sizeof(Widget) 상수로 치환된다.
-    *   생각해보기: sizeof(Widget) 대신 sizeof *w 로 쓰면 어떤 장점이 있을까?
     */
     Widget *w = malloc(sizeof *w);
     if (!w) { perror("malloc"); exit(1); }
@@ -113,13 +111,26 @@ static void screen_add(Screen *s, Widget *w) {
 static void screen_dispatch(Screen *s, int code) {
     for (int i = 0; i < s->count; i++) {
         Widget *w = s->items[i];
+        
+        // 객체가 비었다면 건너뜀
+        if (w == NULL) {
+            continue;
+        }
+
         w->vtbl->on_event(w, code);
+        if (w->closed) {
+            widget_destroy(w);
+            s->items[i] = NULL;
+        }
     }
 }
 
 static void screen_render(Screen *s) {
     for (int i = 0; i < s->count; i++) {
         Widget *w = s->items[i];
+        if (w == NULL) {
+            continue;
+        }
         w->vtbl->render(w);      
     }
 }
@@ -127,7 +138,6 @@ static void screen_render(Screen *s) {
 static void dialog_on_event(Widget *self, int code) {
     if (code == 1) {
         self->closed = 1;
-        widget_destroy(self);   
     }
 }
 
@@ -156,8 +166,6 @@ int main(void) {
     printf("frame 1:\n");
     screen_render(&s);
     screen_dispatch(&s, 1);
-
-    /* TODO 닫힌(closed) 위젯을 여기서 정리(free + 해당 슬롯 NULL)할 필요가 있음 */
 
     char *status = app_build_status("dialog closed");
     printf("%s\n", status);
