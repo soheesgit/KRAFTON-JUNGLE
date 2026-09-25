@@ -56,15 +56,16 @@ static void expand(const Config *c, const char *tmpl, char *out, size_t outcap) 
     size_t o = 0;
     for (const char *p = tmpl; *p; ) {
         if (p[0] == '$' && p[1] == '{') {
-            const char *end = strchr(p, '}');
+            const char *end = strchr(p, '}'); // p가 가리키는 문자열부터 시작해서 처음 등장하는 } 문자를 찾는다. 아니라면 null pointer 반환
             if (!end) break;
             char key[32];
             size_t kl = (size_t)(end - (p + 2));
             if (kl >= sizeof key) kl = sizeof key - 1;
-            memcpy(key, p + 2, kl);
+            memcpy(key, p + 2, kl); // 메모리 값 복사. p + 2가 가리키는 곳에서 kl바이트를 읽어서 key로 복사
             key[kl] = '\0';
 
-            const char *v = cfg_get(c, key);      
+            const char *v = cfg_get(c, key); 
+            if (v == NULL) v = "";
             size_t vl = strlen(v);                 
             if (o + vl < outcap) { memcpy(out + o, v, vl); o += vl; }
             p = end + 1;
