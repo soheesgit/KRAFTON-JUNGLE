@@ -46,12 +46,17 @@ static char *skip_ws(char *s) {
 }
 
 static void parse_headers(char *text, Headers *h) {
+    // strtok: 문자열을 이쁘게 잘라서 문자열의 포인터를 하나씩 반환하는 함수 반환값은 자른 문자열 char* 
     for (char *line = strtok(text, "\n"); line != NULL; line = strtok(NULL, "\n")) {
-        char *colon = strchr(line, ':');   
+        
+        char *colon = strchr(line, ':');  // 문자열에서 :을 만날때까지.
+        
+        // 만약 line 안에 :가 없다면 건너뛴다. 
+        if (colon == NULL) continue;
 
-        *colon = '\0';                    
-        char *key = line;
-        char *val = skip_ws(colon + 1);
+        *colon = '\0';                    // :가 \0로 바뀐다. \0는 문자 끝을 뜻함
+        char *key = line; // 왼쪽의 값
+        char *val = skip_ws(colon + 1); // 오른쪽 값
 
         if (h->count < MAX_HEADERS) {
             h->keys[h->count] = key;
