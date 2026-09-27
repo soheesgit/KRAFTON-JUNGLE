@@ -65,6 +65,8 @@
 static void dirty_heap(void) {
     void *scratch = malloc(ROWS * sizeof(int *));
     if (scratch) {
+        // memset 함수 : 메모리의 내용(값)을 원하는 크기만큼 특정 값으로 세팅할 수 있는 함수
+        // 크기 ROWS * sizeof(int *)만큼 0xAB 값으로 초기화
         memset(scratch, 0xAB, ROWS * sizeof(int *));
         free(scratch);              /* glibc tcache 로 반환 → 같은 크기 malloc 이 이 블록을
                                        LIFO 로 되돌려받는다(리눅스+glibc 고정이라 결정적). */
@@ -73,10 +75,11 @@ static void dirty_heap(void) {
 
 static int **make_matrix(void) {
 
-    int **rows = malloc(ROWS * sizeof(int *));
+    // malloc 대신 calloc을 쓰게 되면 rows[0] ~ rows[31]이 처음에 전부 NULL로 시작한다.
+    int **rows = calloc(ROWS, sizeof(int *));
     if (!rows) { perror("malloc"); exit(1); }
 
-    for (int i = 0; i < ROWS; i += 2) {
+    for (int i = 0; i < ROWS; i+=2) {
         int *r = malloc(COLS * sizeof(int));
         for (int j = 0; j < COLS; j++) r[j] = i * COLS + j;
         rows[i] = r;
@@ -87,6 +90,9 @@ static int **make_matrix(void) {
 static long row_sum(int **rows, int nrows) {
     long total = 0;
     for (int i = 0; i < nrows; i++) {
+        
+        if (rows[i] == NULL) continue;
+
         for (int j = 0; j < COLS; j++) {
             total += rows[i][j];      
         }
