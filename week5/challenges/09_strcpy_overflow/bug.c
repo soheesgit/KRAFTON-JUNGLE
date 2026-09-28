@@ -38,7 +38,7 @@
 /* 필요한 총 바이트 수 = 모든 조각 길이 합 + 종료 문자 1 */
 static size_t joined_size(const char *const *parts, int n) {
     size_t total = 1;                        /* '\0' 자리 */
-    for (int i = 0; i < n - 1; i++) {        
+    for (int i = 0; i < n; i++) {        
         total += strlen(parts[i]);
     }
     return total;
@@ -48,7 +48,6 @@ static char *join(const char *const *parts, int n) {
     size_t need = joined_size(parts, n);
     char *out = malloc(need);                /* 마지막 조각 길이만큼 부족하게 할당됨 */
     if (!out) { perror("malloc"); exit(1); }
-
     size_t off = 0;
     for (int i = 0; i < n; i++) {            /* 복사는 마지막 조각까지 전부 → 오버플로 */
         strcpy(out + off, parts[i]);
@@ -61,11 +60,11 @@ static char *join(const char *const *parts, int n) {
 int main(void) {
     
     static char body[200000];
-    memset(body, 'x', sizeof body - 1);
-    body[sizeof body - 1] = '\0';
+    memset(body, 'x', sizeof body - 1); // body 안의 모든 공간을 x값으로 채운다.
+    body[sizeof body - 1] = '\0'; //마지막 body는 종료문자를 넣는다.
 
     const char *parts[] = { "GET ", "/index.html", " HTTP/1.1\r\n\r\n", body };
-    int n = (int)(sizeof(parts) / sizeof(parts[0]));
+    int n = (int)(sizeof(parts) / sizeof(parts[0])); //요소의 개수를 구한다
 
     char *msg = join(parts, n);              /* 복사 중 힙 오버플로 → 크래시 */
 
